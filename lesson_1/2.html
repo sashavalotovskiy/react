@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lesson_1_2</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser.js"></script>
+</head>
+<body>
+    <div id='content'></div>
+
+    <script type="text/babel">
+        var DEFAULTNAME = 'stranger';
+        var Hello = React.createClass({
+            getInitialState: function() {
+                return {
+                    defaultName: DEFAULTNAME
+                };
+            },
+            handlerChangeName: function(event) {
+                var name = DEFAULTNAME;
+
+                if(event.target.value) {
+                    name = event.target.value;
+                }
+
+                this.setState({
+                    defaultName: name
+                });
+            },
+            render: function() {
+                return (
+                    <div className="hello-block">
+                        <input type="text" placeholder="Name" onChange={ this.handlerChangeName } />
+                        <p>Hello, { this.state.defaultName }</p>
+                    </div>
+                );
+            }
+        });
+
+        ReactDOM.render(
+            <Hello />,
+            document.getElementById('content')
+        );
+    </script>
+</body>
+</html>
