@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rectangle</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.0/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/EventEmitter/5.1.0/EventEmitter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser.js"></script>
+
+    <style type="text/css">
+        .row {
+            display: flex;
+        }
+        .cell {
+            width:20px;
+            height: 20px;
+            border: 1px solid #000;
+            margin: 2px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id='content'></div>
+
+    <script type="text/babel">
+        window.ee = new EventEmitter();
+        var countRows = 10;
+        var countColumns = 10;
+        var rectangleData = [];
+
+        for(var i = 0; i < countRows; i++) {
+            rectangleData[i] = [];
+            for(var j = 0; j < countColumns; j++) {
+                rectangleData[i][j] = {
+                    'is_occupied': false,
+                    'is_hover': false,
+                    'number': null
+                };
+            }
+        }
+
+        var Header = React.createClass({
+            render: function() {
+                return (
+                    <div className="header">
+                        <button>New Game</button>
+                        <span>Time: </span>
+                        <span>Best Result:</span>
+                        <span>Current Result: {this.props.currentResult}</span>
+                    </div>
+                );
+            }
+        });
+
+        var Cell = React.createClass({
+            onClickHandler: function(indexCol, e) {
+                var parent = e.target.parentNode;
+                var data = {
+                    indexCol: parseInt(indexCol),
+                    indexRow: parseInt(parent.getAttribute('data-index-row'))
+                }
+
+                window.ee.emit('Click.cell', data);
+            },
+            render: function() {
+                var item = this.props.item;
+
+                return (
+                    <div className="cell" 
+                            onClick={this.onClickHandler.bind(this, this.props.indexCol)} 
+                            data-index-col={this.props.indexCol}
+                    >
+                        {item.number}
+                    </div>
+                );
+            }
+        });
+
+        var Row = React.createClass({
+            render: function() {
+                var self = this;
+                var columns = this.props.columns.map(function(item, indexCol) {
+                    return (
+                        <Cell key={indexCol} item={item} indexCol={indexCol} />
+                    );
+                });
+
+                return (
+                    <div className="row" data-index-row={this.props.indexRow}>
+                        {columns}
+                    </div>
+                );
+            }
+        });
+
+        var Rectangle = React.createClass({
+            render: function() {
+                var data = this.props.data;
+                var rows = data.map(function(columns, indexRow) {
+                    return (
+                        <Row key={indexRow} columns={columns} indexRow={indexRow} />
+                    );
+                });
+
+                return (
+                    <div className="rectangle">
+                        {rows}
+                    </div>
+                );
+            }
+        });
+
+        var App = React.createClass({
+            getInitialState: function() {
+                return {
+                    rectangle: rectangleData,
+                    currentResult: 0,
+                    prevCell: null
+                }
+            },
+            isLose: function(data) {
+                var rectangle = this.state.rectangle;
+                var flag1 = rectangle[data.indexRow - 2] != undefined && rectangle[data.indexRow - 2][data.indexCol - 1] != undefined && rectangle[data.indexRow - 2][data.indexCol - 1].number === null;  
+                var flag2 = rectangle[data.indexRow - 2] != undefined &&  rectangle[data.indexRow - 2][data.indexCol + 1] != undefined && rectangle[data.indexRow - 2][data.indexCol + 1].number === null;
+                var flag3 = rectangle[data.indexRow - 1] != undefined &&  rectangle[data.indexRow - 1][data.indexCol - 2] != undefined && rectangle[data.indexRow - 1][data.indexCol - 2].number === null;
+                var flag4 = rectangle[data.indexRow - 1] != undefined &&  rectangle[data.indexRow - 1][data.indexCol + 2] != undefined && rectangle[data.indexRow - 1][data.indexCol + 2].number === null;
+                var flag5 = rectangle[data.indexRow + 1] != undefined &&  rectangle[data.indexRow + 1][data.indexCol - 2] != undefined && rectangle[data.indexRow + 1][data.indexCol - 2].number === null;
+                var flag6 = rectangle[data.indexRow + 1] != undefined &&  rectangle[data.indexRow + 1][data.indexCol + 2] != undefined && rectangle[data.indexRow + 1][data.indexCol + 2].number === null;
+                var flag7 = rectangle[data.indexRow + 2] != undefined &&  rectangle[data.indexRow + 2][data.indexCol - 1] != undefined && rectangle[data.indexRow + 2][data.indexCol - 1].number === null;
+                var flag8 = rectangle[data.indexRow + 2] != undefined &&  rectangle[data.indexRow + 2][data.indexCol + 1] != undefined && rectangle[data.indexRow + 2][data.indexCol + 1].number === null;
+
+                if(flag1 || flag2 || flag3 || flag4 || flag5 || flag6 || flag7 || flag8) return false;
+
+                return true;
+            },
+            isValid: function(data) {
+                if(this.state.prevCell === null) return true;
+
+                var prevCell = this.state.prevCell;
+
+                var flag1 = (((prevCell.indexRow - 2) === data.indexRow) && ((prevCell.indexCol - 1) === data.indexCol));
+                var flag2 = (((prevCell.indexRow - 2) === data.indexRow) && ((prevCell.indexCol + 1) === data.indexCol));
+                var flag3 = (((prevCell.indexRow - 1) === data.indexRow) && ((prevCell.indexCol - 2) === data.indexCol));
+                var flag4 = (((prevCell.indexRow - 1) === data.indexRow) && ((prevCell.indexCol + 2) === data.indexCol));
+                var flag5 = (((prevCell.indexRow + 1) === data.indexRow) && ((prevCell.indexCol - 2) === data.indexCol));
+                var flag6 = (((prevCell.indexRow + 1) === data.indexRow) && ((prevCell.indexCol + 2) === data.indexCol));
+                var flag7 = (((prevCell.indexRow + 2) === data.indexRow) && ((prevCell.indexCol - 1) === data.indexCol));
+                var flag8 = (((prevCell.indexRow + 2) === data.indexRow) && ((prevCell.indexCol + 1) === data.indexCol));
+
+                if(flag1 || flag2 || flag3 || flag4 || flag5 || flag6 || flag7 || flag8) return true;
+
+                return false;
+
+            },
+            componentDidMount: function() {
+                var self = this;
+                window.ee.addListener('Click.cell', function(data) {
+                    var newRectangle = self.state.rectangle;
+
+                    if(newRectangle[data.indexRow][data.indexCol].number === null && self.isValid(data)) {
+                        var currentResult = ++self.state.currentResult;
+                        newRectangle[data.indexRow][data.indexCol].number = currentResult;
+
+                        self.setState({
+                            rectangle: newRectangle,
+                            currentResult: currentResult,
+                            prevCell: data
+                        });
+
+                        if(self.isLose(data)) {
+                            alert('You lose');
+                        } else if(currentResult === 100) {
+                            alert('You win');
+                        }
+                    }
+                });
+            },
+            render: function() {
+                return (
+                    <div className="app">
+                        <Header currentResult={this.state.currentResult} />
+                        <Rectangle data={this.state.rectangle} />
+                    </div>
+                );
+            }
+        });
+
+        ReactDOM.render(
+            <App />,
+            document.getElementById('content')
+        );
+    </script>
+</body>
+</html>
