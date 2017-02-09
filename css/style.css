@@ -1,0 +1,148 @@
+@import url(http://fonts.googleapis.com/css?family=Droid+Sans:bold+Lobster);
+@import url(http://fonts.googleapis.com/css?family=Lobster);
+html {
+    background: url('../img/bg.jpg');
+    background-size: cover;
+}
+.rectangle {
+    background: #fff;
+    border-radius: 5px;
+}
+.app {
+max-width: 500px;
+margin: 0 auto;
+font: 24px/1em 'Droid Sans', sans-serif;
+font-weight: bold;
+}
+.row {
+display: flex;
+}
+.cell-wrapper {
+width: 100%;
+}
+.cell {
+margin-left: auto;
+margin-right: auto;
+padding-top: 50%;
+padding-bottom: 50%;
+border: 1px solid #000;
+text-align: center;
+font-weight: bold;
+position: relative;
+cursor: pointer;
+box-shadow: inset 2px 2px 5px rgba(154, 147, 140, 0.5), 1px 1px 5px rgba(255, 255, 255, 1);
+}
+.cell:after {
+    content: attr(data-number);
+    position: absolute;
+    display: inline-block;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    line-height: 2em;
+    top:0;
+    left: 0;
+}
+.header {
+  color: red;
+}
+button {
+
+/* text */
+    text-decoration:        none;
+    font:                   24px/1em 'Droid Sans', sans-serif;
+    font-weight:            bold;
+    text-shadow:            rgba(255,255,255,.5) 0 1px 0;
+    -webkit-user-select:    none;
+    -moz-user-select:       none;
+    user-select:            none;
+    
+    
+/* layout */
+    padding:                .5em .6em .4em .6em;
+    margin:                 .5em;
+    display:                inline-block;
+    position:               relative;
+    
+    -webkit-border-radius:  8px;
+    -moz-border-radius:     8px;
+    border-radius:  8px;
+    
+/* effects */
+    border-top:         1px solid rgba(255,255,255,0.8);
+    border-bottom:      1px solid rgba(0,0,0,0.1);
+    
+    background-image:   -webkit-gradient(radial, 50% 0, 100, 50% 0, 0, from( rgba(255,255,255,0) ), to( rgba(255,255,255,0.7) )), url(https://lh4.googleusercontent.com/-Qs9-Ohgo6sk/UY11O1WoMQI/AAAAAAAACME/nUID7awcMow/s50-no/noise.png);
+    background-image:   -moz-radial-gradient(top, ellipse cover, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 100%), url(https://lh4.googleusercontent.com/-Qs9-Ohgo6sk/UY11O1WoMQI/AAAAAAAACME/nUID7awcMow/s50-no/noise.png);
+    background-image:   gradient(radial, 50% 0, 100, 50% 0, 0, from( rgba(255,255,255,0) ), to( rgba(255,255,255,0.7) )), url(https://lh4.googleusercontent.com/-Qs9-Ohgo6sk/UY11O1WoMQI/AAAAAAAACME/nUID7awcMow/s50-no/noise.png);
+
+    -webkit-transition: background .2s ease-in-out;
+    -moz-transition:    background .2s ease-in-out;
+    transition:         background .2s ease-in-out;
+    
+/* color */
+    color:              hsl(0, 0%, 40%) !important;
+    background-color:   hsl(0, 0%, 75%);
+    
+    -webkit-box-shadow: inset rgba(255,254,255,0.6) 0 0.3em .3em, inset rgba(0,0,0,0.15) 0 -0.1em .3em, /* inner shadow */ 
+                        hsl(0, 0%, 60%) 0 .1em 3px, hsl(0, 0%, 45%) 0 .3em 1px, /* color border */
+                        rgba(0,0,0,0.2) 0 .5em 5px; /* drop shadow */
+    -moz-box-shadow:    inset rgba(255,254,255,0.6) 0 0.3em .3em, inset rgba(0,0,0,0.15) 0 -0.1em .3em, /* inner shadow */ 
+                        hsl(0, 0%, 60%) 0 .1em 3px, hsl(0, 0%, 45%) 0 .3em 1px, /* color border */
+                        rgba(0,0,0,0.2) 0 .5em 5px; /* drop shadow */
+    box-shadow:         inset rgba(255,254,255,0.6) 0 0.3em .3em, inset rgba(0,0,0,0.15) 0 -0.1em .3em, /* inner shadow */ 
+                        hsl(0, 0%, 60%) 0 .1em 3px, hsl(0, 0%, 45%) 0 .3em 1px, /* color border */
+                        rgba(0,0,0,0.2) 0 .5em 5px; /* drop shadow */
+}
+
+/* -------------- button (tag) -------------- */
+
+button {
+    border-left: none;
+    border-right: none;
+}
+button:hover {
+    cursor: pointer;
+}
+
+
+/* -------------- icon -------------- */
+button:before {
+    font:           1.2em/0 'Pictos', sans-serif;
+    content:        attr(data-icon); /* gets the icon value from the custom data attribute and puts it infront of the button label */
+    margin-right:   0.4em;
+    
+    
+}
+/* icon only */
+.icon {
+    font-weight: normal;
+    font-style: normal;
+    text-indent:    -999em;
+}
+.icon:before { 
+    margin-right:   0;
+    display:        block;
+    height:         0;
+    text-indent:    0px;    
+}
+
+
+
+/* -------------- colours -------------- */
+
+button {
+    color:              hsl(39, 100%, 30%) !important;
+    background-color:   hsl(39, 100%, 50%);
+
+    -webkit-box-shadow: inset rgba(255,254,255,0.6) 0 0.3em .3em, inset rgba(0,0,0,0.15) 0 -0.1em .3em, /* inner shadow */ 
+                            hsl(39, 100%, 40%) 0 .1em 3px, hsl(39, 100%, 30%) 0 .3em 1px, /* color border */
+                            rgba(0,0,0,0.2) 0 .5em 5px; /* drop shadow */
+    -moz-box-shadow:    inset rgba(255,254,255,0.6) 0 0.3em .3em, inset rgba(0,0,0,0.15) 0 -0.1em .3em, /* inner shadow */ 
+                            hsl(39, 100%, 40%) 0 .1em 3px, hsl(39, 100%, 30%) 0 .3em 1px, /* color border */
+                            rgba(0,0,0,0.2) 0 .5em 5px; /* drop shadow */
+    box-shadow:         inset rgba(255,254,255,0.6) 0 0.3em .3em, inset rgba(0,0,0,0.15) 0 -0.1em .3em, /* inner shadow */ 
+                            hsl(39, 100%, 40%) 0 .1em 3px, hsl(39, 100%, 30%) 0 .3em 1px, /* color border */
+                            rgba(0,0,0,0.2) 0 .5em 5px; /* drop shadow */
+}
+button:hover {  background-color: hsl(39, 100%, 65%); }
