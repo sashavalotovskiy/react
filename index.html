@@ -50,12 +50,25 @@
             newGame: function() {
                 window.ee.emit('newGame', 1);
             },
+            back: function() {
+                window.ee.emit('back', 1);
+            },
+            getBackButton: function(isActive) {
+                if(isActive) {
+                    return (
+                        <button onClick={this.back} className="btn-back">Back</button>
+                    );
+                }
+
+                return '';
+            },
             render: function() {
 
                 return (
                     <div className="header">
                         <button onClick={this.newGame} data-icon="♞">New Game</button>
                         <span>Current Result: {this.props.currentResult}</span>
+                        {this.getBackButton(this.props.isActiveBackBtn)}
                         <Levels level={this.props.level} />
                     </div>
                 );
@@ -165,8 +178,9 @@
                 return {
                     rectangle: generateData(startLevel),
                     currentResult: 0,
-                    prevCell: null,
-                    level: startLevel 
+                    currentCell: null,
+                    level: startLevel,
+                    isActiveBackBtn: false
                 }
             },
             isLose: function(data) {
@@ -182,12 +196,12 @@
                 return true;
             },
             isValid: function(data) {
-                if(this.state.prevCell === null) return true;
+                if(this.state.currentCell === null) return true;
 
-                var prevCell = this.state.prevCell;
+                var currentCell = this.state.currentCell;
 
                 for(var i = 0; i < fields.length; i++) {
-                    if(((prevCell.indexRow + fields[i].x) === data.indexRow) && ((prevCell.indexCol + fields[i].y) === data.indexCol)) {
+                    if(((currentCell.indexRow + fields[i].x) === data.indexRow) && ((currentCell.indexCol + fields[i].y) === data.indexCol)) {
 
                         return true;
                     }
@@ -219,40 +233,61 @@
 
                 window.ee.addListener('newGame', function(data) {
                     var level = self.state.level;
-                    self.setState({
+
+                    var updateData = {
                         rectangle: generateData(level),
                         currentResult: 0,
-                        prevCell: null
-                    }); 
+                        currentCell: null,
+                        isActiveBackBtn: false
+                    };
+
+                    self._updateLocalStorage(updateData);
+                    self.setState(updateData);
+                });
+
+                window.ee.addListener('back', function(data) {
+                    var localTasks = JSON.parse(localStorage.getItem('data'));
+                    
+                    console.log(localTasks);
+
+                    if (localTasks) {
+                        localTasks.isActiveBackBtn = false;
+                        self.setState(localTasks);
+                    }
                 });
 
                 window.ee.addListener('Change.level', function(newLevel) {
-                    self.setState({
+                    var updateData = {
                         rectangle: generateData(newLevel),
                         currentResult: 0,
-                        prevCell: null,
-                        level: newLevel
-                    });
+                        currentCell: null,
+                        level: newLevel,
+                        isActiveBackBtn: false
+                    };
+                    self._updateLocalStorage(updateData);
+                    self.setState(updateData);
                 });
 
                 window.ee.addListener('Click.cell', function(data) {
-                    var newRectangle = self.state.rectangle;
+                    self._updateLocalStorage(self.state);
 
-                    if(newRectangle[data.indexRow][data.indexCol].number === null && self.isValid(data)) {
+                    if(self.state.rectangle[data.indexRow][data.indexCol].number === null && self.isValid(data)) {
                         var currentResult = ++self.state.currentResult;
+
+                        var newRectangle = self.hoverCells(self.state.rectangle, data);
                         newRectangle[data.indexRow][data.indexCol].number = currentResult;
-
-                        newRectangle = self.hoverCells(newRectangle, data);
-
-                        self.setState({
+                        var updateData = {
                             rectangle: newRectangle,
                             currentResult: currentResult,
-                            prevCell: data
-                        });
+                            currentCell: data,
+                            isActiveBackBtn: true
+                        };
+
+                        self.setState(updateData);
 
                         if(currentResult == Math.pow(self.state.level, 2)) {
                             alert('You win');
-                        }else if(self.isLose(data)) {
+                        } else if(self.isLose(data)) {
                             alert('You lose');
                         }
                     }
@@ -266,10 +301,14 @@
             render: function() {
                 return (
                     <div className="app">
-                        <Header currentResult={this.state.currentResult} level={this.state.level} />
+                        <Header currentResult={this.state.currentResult} level={this.state.level} isActiveBackBtn={this.state.isActiveBackBtn} />
                         <Rectangle data={this.state.rectangle} />
                     </div>
                 );
+            },
+            _updateLocalStorage: function(data) {
+                var data = JSON.stringify(data);
+                localStorage.setItem('data', data);
             }
         });
 
