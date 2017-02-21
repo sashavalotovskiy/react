@@ -16,15 +16,25 @@
 
     <script type="text/babel">
         window.ee = new EventEmitter();
+        const fields = [
+            {x: -2, y: -1},
+            {x: -2, y: 1},
+            {x: -1, y: -2},
+            {x: -1, y: 2},
+            {x: 1, y: 2},
+            {x: 1, y: -2},
+            {x: 2, y: 1},
+            {x: 2, y: -1}
+        ];
+        const levels = [5, 6, 7, 8, 9, 10, 11];
+        const startLevel = 10;
 
-        function generateData() {
-            var countRows = 10;
-            var countColumns = 10;
+        function generateData(level) {
             var rectangleData = [];
             
-            for(var i = 0; i < countRows; i++) {
+            for(var i = 0; i < level; i++) {
                 rectangleData[i] = [];
-                for(var j = 0; j < countColumns; j++) {
+                for(var j = 0; j < level; j++) {
                     rectangleData[i][j] = {
                         'is_occupied': false,
                         'is_hover': false,
@@ -41,10 +51,36 @@
                 window.ee.emit('newGame', 1);
             },
             render: function() {
+
                 return (
                     <div className="header">
                         <button onClick={this.newGame} data-icon="♞">New Game</button>
                         <span>Current Result: {this.props.currentResult}</span>
+                        <Levels level={this.props.level} />
+                    </div>
+                );
+            }
+        });
+
+        var Levels = React.createClass({
+            getOptions: function() {
+                return levels.map(function(item) {
+                    return (
+                        <option key={item} value={item}>{item}</option>    
+                    )
+                });
+            },
+            onChangeHandler: function(e) {
+                window.ee.emit('Change.level', e.target.value);
+            },
+            render: function() {
+                return (
+                    <div className="level">
+                        <label>Levels</label>
+                        <select defaultValue={this.props.level} 
+                            onChange={this.onChangeHandler}>
+                            { this.getOptions() }
+                        </select>
                     </div>
                 );
             }
@@ -60,12 +96,25 @@
 
                 window.ee.emit('Click.cell', data);
             },
+            getClasses: function(cell) {
+                var self = this;
+
+                var classes = classNames({
+                  'cell': true,
+                  'is_hover': self.isHover(cell)
+                });
+
+                return classes;
+            },
+            isHover: function(cell) {
+                return cell.is_hover ? 'is_hover' : '';
+            },
             render: function() {
                 var item = this.props.item;
 
                 return (
                     <div className="cell-wrapper">
-                        <div className="cell" 
+                        <div className={['cell', this.isHover(item)].join(' ')} 
                                 onClick={this.onClickHandler.bind(this, this.props.indexCol)} 
                                 data-index-col={this.props.indexCol} 
                                 data-number={item.number}
@@ -114,23 +163,21 @@
         var App = React.createClass({
             getInitialState: function() {
                 return {
-                    rectangle: generateData(),
+                    rectangle: generateData(startLevel),
                     currentResult: 0,
-                    prevCell: null
+                    prevCell: null,
+                    level: startLevel 
                 }
             },
             isLose: function(data) {
                 var rectangle = this.state.rectangle;
-                var flag1 = rectangle[data.indexRow - 2] != undefined && rectangle[data.indexRow - 2][data.indexCol - 1] != undefined && rectangle[data.indexRow - 2][data.indexCol - 1].number === null;  
-                var flag2 = rectangle[data.indexRow - 2] != undefined &&  rectangle[data.indexRow - 2][data.indexCol + 1] != undefined && rectangle[data.indexRow - 2][data.indexCol + 1].number === null;
-                var flag3 = rectangle[data.indexRow - 1] != undefined &&  rectangle[data.indexRow - 1][data.indexCol - 2] != undefined && rectangle[data.indexRow - 1][data.indexCol - 2].number === null;
-                var flag4 = rectangle[data.indexRow - 1] != undefined &&  rectangle[data.indexRow - 1][data.indexCol + 2] != undefined && rectangle[data.indexRow - 1][data.indexCol + 2].number === null;
-                var flag5 = rectangle[data.indexRow + 1] != undefined &&  rectangle[data.indexRow + 1][data.indexCol - 2] != undefined && rectangle[data.indexRow + 1][data.indexCol - 2].number === null;
-                var flag6 = rectangle[data.indexRow + 1] != undefined &&  rectangle[data.indexRow + 1][data.indexCol + 2] != undefined && rectangle[data.indexRow + 1][data.indexCol + 2].number === null;
-                var flag7 = rectangle[data.indexRow + 2] != undefined &&  rectangle[data.indexRow + 2][data.indexCol - 1] != undefined && rectangle[data.indexRow + 2][data.indexCol - 1].number === null;
-                var flag8 = rectangle[data.indexRow + 2] != undefined &&  rectangle[data.indexRow + 2][data.indexCol + 1] != undefined && rectangle[data.indexRow + 2][data.indexCol + 1].number === null;
 
-                if(flag1 || flag2 || flag3 || flag4 || flag5 || flag6 || flag7 || flag8) return false;
+                for(var i = 0; i < fields.length; i++) {
+                    if(rectangle[data.indexRow + fields[i].x] != undefined && rectangle[data.indexRow + fields[i].x][data.indexCol + fields[i].y] != undefined && rectangle[data.indexRow + fields[i].x][data.indexCol + fields[i].y].number === null) {
+
+                        return false;
+                    }
+                }
 
                 return true;
             },
@@ -139,29 +186,52 @@
 
                 var prevCell = this.state.prevCell;
 
-                var flag1 = (((prevCell.indexRow - 2) === data.indexRow) && ((prevCell.indexCol - 1) === data.indexCol));
-                var flag2 = (((prevCell.indexRow - 2) === data.indexRow) && ((prevCell.indexCol + 1) === data.indexCol));
-                var flag3 = (((prevCell.indexRow - 1) === data.indexRow) && ((prevCell.indexCol - 2) === data.indexCol));
-                var flag4 = (((prevCell.indexRow - 1) === data.indexRow) && ((prevCell.indexCol + 2) === data.indexCol));
-                var flag5 = (((prevCell.indexRow + 1) === data.indexRow) && ((prevCell.indexCol - 2) === data.indexCol));
-                var flag6 = (((prevCell.indexRow + 1) === data.indexRow) && ((prevCell.indexCol + 2) === data.indexCol));
-                var flag7 = (((prevCell.indexRow + 2) === data.indexRow) && ((prevCell.indexCol - 1) === data.indexCol));
-                var flag8 = (((prevCell.indexRow + 2) === data.indexRow) && ((prevCell.indexCol + 1) === data.indexCol));
+                for(var i = 0; i < fields.length; i++) {
+                    if(((prevCell.indexRow + fields[i].x) === data.indexRow) && ((prevCell.indexCol + fields[i].y) === data.indexCol)) {
 
-                if(flag1 || flag2 || flag3 || flag4 || flag5 || flag6 || flag7 || flag8) return true;
+                        return true;
+                    }
+                }
 
                 return false;
 
+            },
+            hoverCells: function(rectangle, cell) {
+                rectangle = rectangle.map(function(row) {
+                    return row.map(function(cell) {
+                        cell['is_hover'] = false;
+                        
+                        return cell;
+                    });
+                });
+
+                for(var i = 0; i < fields.length; i++) {
+                    if(rectangle[cell.indexRow + fields[i].x] != undefined && rectangle[cell.indexRow + fields[i].x][cell.indexCol + fields[i].y] != undefined && rectangle[cell.indexRow + fields[i].x][cell.indexCol + fields[i].y].number === null) {
+
+                        rectangle[cell.indexRow + fields[i].x][cell.indexCol + fields[i].y].is_hover = true;
+                    }
+                }
+
+                return rectangle;
             },
             componentDidMount: function() {
                 var self = this;
 
                 window.ee.addListener('newGame', function(data) {
-
+                    var level = self.state.level;
                     self.setState({
-                        rectangle: generateData(),
+                        rectangle: generateData(level),
                         currentResult: 0,
                         prevCell: null
+                    }); 
+                });
+
+                window.ee.addListener('Change.level', function(newLevel) {
+                    self.setState({
+                        rectangle: generateData(newLevel),
+                        currentResult: 0,
+                        prevCell: null,
+                        level: newLevel
                     });
                 });
 
@@ -172,16 +242,18 @@
                         var currentResult = ++self.state.currentResult;
                         newRectangle[data.indexRow][data.indexCol].number = currentResult;
 
+                        newRectangle = self.hoverCells(newRectangle, data);
+
                         self.setState({
                             rectangle: newRectangle,
                             currentResult: currentResult,
                             prevCell: data
                         });
 
-                        if(self.isLose(data)) {
-                            alert('You lose');
-                        } else if(currentResult === 100) {
+                        if(currentResult == Math.pow(self.state.level, 2)) {
                             alert('You win');
+                        }else if(self.isLose(data)) {
+                            alert('You lose');
                         }
                     }
                 });
@@ -189,11 +261,12 @@
             componentWillUnmount: function() {
                 window.ee.removeListener('Click.cell');
                 window.ee.removeListener('newGame');
+                window.ee.removeListener('Change.level');
             },
             render: function() {
                 return (
                     <div className="app">
-                        <Header currentResult={this.state.currentResult} />
+                        <Header currentResult={this.state.currentResult} level={this.state.level} />
                         <Rectangle data={this.state.rectangle} />
                     </div>
                 );

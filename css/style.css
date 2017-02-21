@@ -1,5 +1,3 @@
-@import url(http://fonts.googleapis.com/css?family=Droid+Sans:bold+Lobster);
-@import url(http://fonts.googleapis.com/css?family=Lobster);
 html {
     background: url('../img/bg.jpg');
     background-size: cover;
@@ -11,7 +9,7 @@ html {
 .app {
 max-width: 500px;
 margin: 0 auto;
-font: 24px/1em 'Droid Sans', sans-serif;
+font-size: 24px/1em;
 font-weight: bold;
 }
 .row {
@@ -31,6 +29,10 @@ font-weight: bold;
 position: relative;
 cursor: pointer;
 box-shadow: inset 2px 2px 5px rgba(154, 147, 140, 0.5), 1px 1px 5px rgba(255, 255, 255, 1);
+font-size: 1.5em;
+}
+.cell.is_hover {
+    background-color: hsl(39, 98%, 64%);
 }
 .cell:after {
     content: attr(data-number);
@@ -50,7 +52,7 @@ button {
 
 /* text */
     text-decoration:        none;
-    font:                   24px/1em 'Droid Sans', sans-serif;
+    font:                   18px/1em 'Droid Sans', sans-serif;
     font-weight:            bold;
     text-shadow:            rgba(255,255,255,.5) 0 1px 0;
     -webkit-user-select:    none;
@@ -71,10 +73,6 @@ button {
 /* effects */
     border-top:         1px solid rgba(255,255,255,0.8);
     border-bottom:      1px solid rgba(0,0,0,0.1);
-    
-    background-image:   -webkit-gradient(radial, 50% 0, 100, 50% 0, 0, from( rgba(255,255,255,0) ), to( rgba(255,255,255,0.7) )), url(https://lh4.googleusercontent.com/-Qs9-Ohgo6sk/UY11O1WoMQI/AAAAAAAACME/nUID7awcMow/s50-no/noise.png);
-    background-image:   -moz-radial-gradient(top, ellipse cover, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 100%), url(https://lh4.googleusercontent.com/-Qs9-Ohgo6sk/UY11O1WoMQI/AAAAAAAACME/nUID7awcMow/s50-no/noise.png);
-    background-image:   gradient(radial, 50% 0, 100, 50% 0, 0, from( rgba(255,255,255,0) ), to( rgba(255,255,255,0.7) )), url(https://lh4.googleusercontent.com/-Qs9-Ohgo6sk/UY11O1WoMQI/AAAAAAAACME/nUID7awcMow/s50-no/noise.png);
 
     -webkit-transition: background .2s ease-in-out;
     -moz-transition:    background .2s ease-in-out;
